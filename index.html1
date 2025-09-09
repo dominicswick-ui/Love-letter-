@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLASSIFIED ACCESS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* Terminal Background Effect */
+        .terminal-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .terminal-line {
+            position: absolute;
+            color: rgba(0, 255, 0, 0.3);
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: nowrap;
+            animation: terminalScroll 15s linear infinite;
+        }
+
+        @keyframes terminalScroll {
+            0% { 
+                transform: translateX(100vw);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { 
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            background: linear-gradient(145deg, #0a0a0a, #1a1a1a);
+            border-radius: 5px;
+            border: 2px solid #00ff00;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 0, 0.3),
+                inset 0 0 30px rgba(0, 255, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 255, 0, 0.1), 
+                transparent
+            );
+            animation: scanlinePass 3s ease-in-out infinite;
+        }
+
+        @keyframes scanlinePass {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Agency Header */
+        .agency-header {
+            color: #00ff00;
+            font-size: 12px;
+            text-align: left;
+            margin-bottom: 30px;
+            font-family: 'Courier New', monospace;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .classified-banner {
+            color: #ff0000;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            padding: 5px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.7; }
+        }
+
+        .heart {
+            font-size: 60px;
+            color: #00ff00;
+            margin-bottom: 20px;
+            animation: heartbeat 2s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        h1 {
+            color: #00ff00;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #00ff00;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #00ff00;
+            border-radius: 3px;
+            font-size: 18px;
+            text-align: center;
+            background: #000;
+            color: #00ff00;
+            transition: all 0.3s ease;
+            letter-spacing: 8px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            box-shadow: 
+                0 0 10px rgba(0, 255, 0, 0.3),
+                inset 0 0 10px rgba(0, 255, 0, 0.1);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.05);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+
+        input::placeholder {
+            color: rgba(0, 255, 0, 0.5);
+        }
+
+        button {
+            background: linear-gradient(45deg, #003300, #006600);
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 15px 40px;
+            border-radius: 3px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: linear-gradient(45deg, #006600, #00aa00);
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .error {
+            color: #ff0000;
+            margin-top: 15px;
+            font-style: italic;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        /* Matrix Scanner */
+        .matrix-scanner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .matrix-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            font-size: 18px;
+            line-height: 20px;
+            animation: matrixFall 4s linear infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes matrixFall {
+            0% {
+                top: -100%;
+                opacity: 1;
+            }
+            100% {
+                top: 100vh;
+                opacity: 0;
+            }
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                #00ff00 20%, 
+                #00ff00 80%, 
+                transparent 100%);
+            box-shadow: 
+                0 0 20px #00ff00,
+                0 0 40px rgba(0, 255, 0, 0.5),
+                0 2px 10px rgba(0, 255, 0, 0.8);
+            animation: screenScan 5s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        @keyframes screenScan {
+            0% { 
+                top: 0; 
+                opacity: 0;
+            }
+            10% { 
+                opacity: 1;
+            }
+            90% { 
+                opacity: 1;
+            }
+            100% { 
+                top: 100vh; 
+                opacity: 0;
+            }
+        }
+
+        .scan-content {
+            position: relative;
+            z-index: 20;
+            text-align: center;
+        }
+
+        .scan-instruction {
+            font-size: 24px;
+            color: #ffff00;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 40px;
+            text-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
+            font-family: 'Courier New', monospace;
+            animation: instructionPulse 2s infinite;
+            border: 2px solid #ffff00;
+            padding: 15px 25px;
+            background: rgba(255, 255, 0, 0.1);
+        }
+
+        @keyframes instructionPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .scan-text {
+            font-size: 28px;
+            color: #00ff00;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 50px;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+            animation: textPulse 2s infinite;
+            font-family: 'Courier New', monospace;
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .scanning-dots::after {
+            content: '';
+            animation: dots 2s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
+        /* Full Screen Progress Bar */
+        .full-screen-progress {
+            position: fixed;
+            bottom: 100px;
+            left: 0;
+            width: 100vw;
+            height: 10px;
+            background: rgba(0, 255, 0, 0.2);
+            border-top: 2px solid #00ff00;
+            border-bottom: 2px solid #00ff00;
+            z-index: 25;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #00cc00);
+            width: 0%;
+            animation: fullScreenProgressFill 18s linear forwards;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+            position: relative;
+        }
+
+        @keyframes fullScreenProgressFill {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -2px;
+            width: 4px;
+            height: calc(100% + 4px);
+            background: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Fact Display - Positioned on Progress Bar */
+        .fact-display {
+            position: fixed;
+            bottom: 120px;
+            left: 0;
+            width: 100vw;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            color: #00ff00;
+            text-align: left;
+            z-index: 30;
+            opacity: 0;
+            padding: 0 20px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .fact-display.show {
+            animation: factSlide 1.5s ease-out forwards;
+        }
+
+        @keyframes factSlide {
+            0% { 
+                opacity: 0; 
+                transform: translateX(-50px);
+            }
+            50% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateX(0);
+            }
+        }
+
+        .success-msg {
+            font-size: 32px;
+            color: #00ff00;
+            font-weight: bold;
+            margin-top: 30px;
+            opacity: 0;
+            animation: successAppear 1s ease-out 18s forwards;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            border: 2px solid #00ff00;
+            padding: 20px;
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        @keyframes successAppear {
+            0% { 
+                opacity: 0; 
+                transform: scale(0.8) translateY(20px);
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.1) translateY(0);
+            }
+            100% { 
+                opacity: 1; 
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* File Selection Styles */
+        .file-item {
+            background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+            border: 1px solid #00ff00;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #00ff00;
+            text-align: left;
+            border-radius: 3px;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+        }
+
+        .file-item:hover {
+            background: linear-gradient(145deg, #003300, #006600);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .special-file {
+            border-color: #ff6b6b !important;
+            color: #ff6b6b !important;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.2) !important;
+        }
+
+        .special-file:hover {
+            background: linear-gradient(145deg, #330000, #660000) !important;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.4) !important;
+        }
+
+        /* Love Letter Styles */
+        .letter {
+            font-family: 'Georgia', serif;
+        }
+
+        .letter h2 {
+            color: #ff6b6b;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .letter-content {
+            color: #333;
+            line-height: 1.8;
+            font-size: 16px;
+            text-align: left;
+            margin-bottom: 25px;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .signature {
+            text-align: right;
+            font-style: italic;
+            color: #666;
+            margin-top: 30px;
+            font-size: 18px;
+        }
+
+        @media (max-width: 480px) {
+            .container { 
+                padding: 30px 20px; 
+                max-width: 95%;
+            }
+            h1 { font-size: 20px; }
+            .heart { font-size: 50px; }
+            .fact-display { 
+                font-size: 14px; 
+                padding: 0 15px;
+            }
+            .agency-header {
+                font-size: 10px;
+            }
+            .scan-instruction {
+                font-size: 18px;
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal-bg" id="terminalBg"></div>
+    
+    <div class="container">
+        <!-- Login Screen -->
+        <div class="content" id="loginScreen">
+            <div class="agency-header">
+                █ CLASSIFIED SYSTEM ACCESS █<br>
+                █ SECURITY LEVEL: MAXIMUM █<br>
+                █ UNAUTHORIZED ACCESS PROHIBITED █
+            </div>
+            
+            <div class="classified-banner">
+                ⚠️ TOP SECRET - EYES ONLY ⚠️
+            </div>
+            
+            <div class="heart">🔒</div>
+            <h1>SECURE DATABASE ENTRY</h1>
+            <p style="color: rgba(0, 255, 0, 0.7); margin-bottom: 30px; font-size: 14px; font-family: 'Courier New', monospace; text-transform: uppercase;">
+                Enter authorized access code to proceed...
+            </p>
+            
+            <div class="input-group">
+                <label for="passcode">Authorization Code:</label>
+                <input type="password" id="passcode" placeholder="••••" maxlength="4">
+            </div>
+            
+            <button onclick="unlockSecret()">🔓 INITIATE BREACH</button>
+            <div class="error" id="errorMsg"></div>
+            
+            <div style="font-size: 10px; color: rgba(0, 255, 0, 0.5); margin-top: 20px; font-family: 'Courier New', monospace;">
+                HINT: TARGET CODENAME "dork" 
+            </div>
+        </div>
+
+        <!-- File Selection Screen -->
+        <div class="content hidden" id="fileScreen">
+            <div style="background: #000; min-height: 100vh; display: flex; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 2000; color: #00ff00; font-family: 'Courier New', monospace;">
+                <div style="background: linear-gradient(145deg, #0a0a0a, #1a1a1a); border: 2px solid #00ff00; box-shadow: 0 0 30px rgba(0, 255, 0, 0.3); padding: 40px; max-width: 600px; width: 90%; text-align: center;">
+                    <div style="font-size: 24px; color: #00ff00; margin-bottom: 30px; text-shadow: 0 0 15px rgba(0, 255, 0, 0.5); text-transform: uppercase; letter-spacing: 2px;">
+                        📁 CLASSIFIED FILES DETECTED
+                    </div>
+                    <div style="font-size: 14px; color: rgba(0, 255, 0, 0.7); margin-bottom: 40px;">
+                        SELECT FILE TO ACCESS:
+                    </div>
+                    
+                    <div style="display: grid; gap: 15px; max-width: 400px; margin: 0 auto;">
+                        <div class="file-item" onclick="selectFile('classified1')">
+                            🔒 CLASSIFIED_DOCUMENT_001.txt
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified2')">
+                            🔒 CLASSIFIED_DOCUMENT_002.txt
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified3')">
+                            🔒 CLASSIFIED_DOCUMENT_003.txt
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified4')">
+                            🔒 CLASSIFIED_DOCUMENT_004.txt
+                        </div>
+                        <div class="file-item special-file" onclick="selectFile('love-letter')">
+                            💕 Doms_secret_love_letter.txt
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified5')">
+                            🔒 CLASSIFIED_DOCUMENT_005.txt
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Love Letter Screen -->
+        <div class="content hidden letter" id="letterScreen">
+            <div style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 2000;">
+                <div style="background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); padding: 40px; max-width: 500px; width: 90%; text-align: center;">
+                    <div style="font-size: 60px; color: #ff6b6b; margin-bottom: 20px;">💖</div>
+                    <h2>My Dearest Dork,</h2>
+                    
+                    <div class="letter-content">
+                        <p>Every day with you feels like a beautiful dream that I never want to wake up from. You light up my world in ways I never knew were possible, and your smile has become my favorite sight in the entire universe.</p>
+                        
+                        <p>From the moment we met, you've filled my life with laughter, joy, and endless love. You make even ordinary moments feel magical, and I find myself falling deeper in love with you every single day.</p>
+                        
+                        <p>You are my best friend, my greatest adventure, and my home all wrapped into one incredible person. Thank you for being exactly who you are - beautiful, kind, funny, and absolutely perfect in every way that matters.</p>
+                        
+                        <p>I love how you scrunch your nose when you laugh, how you always know exactly what to say when I need it most, and how you make me want to be the best version of myself. You are my everything, and I am so grateful that you choose to love me back.</p>
+                        
+                        <p>Here's to all our tomorrows together, filled with more adventures, more laughter, and more love than we know what to do with. You make life beautiful, darling.</p>
+                    </div>
+                    
+                    <div class="signature">
+                        Forever and always yours,<br>
+                        <strong>Your Loving Boyfriend ❤️</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Matrix Scanner -->
+    <div class="matrix-scanner hidden" id="scannerScreen">
+        <div class="matrix-bg" id="matrixBg"></div>
+        <div class="scan-line"></div>
+        
+        <div class="scan-content">
+            <div class="scan-instruction">⚠️ PLEASE HOLD STILL - THE SCAN WILL TAKE A MOMENT ⚠️</div>
+            <div class="scan-text">SCANNING<span class="scanning-dots"></span></div>
+            <div class="success-msg">WELCOME SOPHIA DALUISIO</div>
+        </div>
+        
+        <div class="full-screen-progress">
+            <div class="progress-bar-fill"></div>
+        </div>
+        
+        <div class="fact-display" id="factDisplay"></div>
+    </div>
+
+    <script>
+        const PASSWORD = "dork";
+        
+        const facts = [
+            "Cats names are Loki and Prince",
+            "Mothers name is Marcela Daluisio", 
+            "Fathers name is Diego Daluisio",
+            "Brothers name is Franco Daluisio",
+            "Best friends name is Abigail Langsford",
+            "Lives on 1332 E Ninth St"
+        ];
+        
+        function unlockSecret() {
+            const input = document.getElementById('passcode');
+            const error = document.getElementById('errorMsg');
+            
+            if (!input || !error) return;
+            
+            if (input.value.toLowerCase() === PASSWORD) {
+                startMatrixScan();
+            } else {
+                error.textContent = `ACCESS DENIED - INVALID CODE: "${input.value.toUpperCase()}" - TRY "DORK"`;
+                input.value = '';
+                input.style.borderColor = '#ff0000';
+                input.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.5)';
+                setTimeout(() => {
+                    input.style.borderColor = '#00ff00';
+                    input.style.boxShadow = '0 0 10px rgba(0, 255, 0, 0.3)';
+                }, 2000);
+            }
+        }
+        
+        function startMatrixScan() {
+            const scanner = document.getElementById('scannerScreen');
+            if (scanner) {
+                scanner.classList.remove('hidden');
+                createMatrixRain();
+                createTerminalLines();
+                showFactsSequence();
+                
+                // After 19 seconds, show the file selection
+                setTimeout(showFileSelection, 19000);
+            }
+        }
+        
+        function createTerminalLines() {
+            const terminalBg = document.getElementById('terminalBg');
+            const terminalTexts = [
+                'ACCESSING MAINFRAME...',
+                'BYPASSING FIREWALL...',
+                'DECRYPTING DATA...',
+                'SCANNING FILES...',
+                'EXTRACTING INTEL...',
+                'CONNECTION ESTABLISHED',
+                'DOWNLOADING...',
+                'BREACH SUCCESSFUL'
+            ];
+            
+            setInterval(() => {
+                const line = document.createElement('div');
+                line.className = 'terminal-line';
+                line.textContent = '> ' + terminalTexts[Math.floor(Math.random() * terminalTexts.length)];
+                line.style.top = Math.random() * 100 + 'vh';
+                terminalBg.appendChild(line);
+                
+                setTimeout(() => line.remove(), 15000);
+            }, 2000);
+        }
+        
+        function showFactsSequence() {
+            const factDisplay = document.getElementById('factDisplay');
+            
+            facts.forEach((fact, index) => {
+                setTimeout(() => {
+                    factDisplay.textContent = fact;
+                    factDisplay.classList.add('show');
+                    
+                    // Hide after 2.5 seconds
+                    setTimeout(() => {
+                        factDisplay.classList.remove('show');
+                    }, 2500);
+                }, index * 3000); // Show each fact every 3 seconds
+            });
+        }
+        
+        function createMatrixRain() {
+            const matrixBg = document.getElementById('matrixBg');
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()';
+            const columns = Math.floor(window.innerWidth / 20);
+            
+            for (let i = 0; i < columns; i++) {
+                setTimeout(() => {
+                    createColumn(matrixBg, characters, i);
+                }, i * 100);
+            }
+        }
+        
+        function createColumn(container, chars, columnIndex) {
+            const column = document.createElement('div');
+            column.className = 'matrix-column';
+            column.style.left = (columnIndex * 20) + 'px';
+            column.style.animationDelay = Math.random() * 2 + 's';
+            column.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            
+            let text = '';
+            for (let i = 0; i < 20; i++) {
+                text += chars.charAt(Math.floor(Math.random() * chars.length)) + '<br>';
+            }
+            column.innerHTML = text;
+            
+            container.appendChild(column);
+            
+            setTimeout(() => {
+                column.remove();
+            }, 19000);
+        }
+        
+        function showFileSelection() {
+            const scanner = document.getElementById('scannerScreen');
+            const fileScreen = document.getElementById('fileScreen');
+            
+            if (scanner) scanner.classList.add('hidden');
+            if (fileScreen) fileScreen.classList.remove('hidden');
+        }
+        
+        function selectFile(fileType) {
+            if (fileType === 'love-letter') {
+                showLoveLetter();
+            } else {
+                showClassifiedError();
+            }
+        }
+        
+        function showClassifiedError() {
+            alert('ACCESS DENIED - INSUFFICIENT CLEARANCE LEVEL\n\nThis file requires LEVEL 10 security clearance.\nYour current clearance: LEVEL 3');
+        }
+        
+        function showLoveLetter() {
+            const fileScreen = document.getElementById('fileScreen');
+            const letter = document.getElementById('letterScreen');
+            
+            if (fileScreen) fileScreen.classList.add('hidden');
+            if (letter) letter.classList.remove('hidden');
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('passcode');
+            if (input) {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        unlockSecret();
+                    }
+                });
+            }
+            
+            // Start terminal background effects
+            createTerminalLines();
+        });
+    </script>
+</body>
+</html>
